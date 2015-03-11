@@ -87,6 +87,7 @@ stop(InstanceName) ->
                                       KeyBin::binary(),
                                       ValueBin::binary()).
 put(InstanceName, KeyBin, ValueBin) ->
+    statsd:leo_increment("leo_backend_db_api.put"),
     do_request(put, [InstanceName, KeyBin, ValueBin]).
 
 
@@ -98,6 +99,7 @@ put(InstanceName, KeyBin, ValueBin) ->
              {error, any()} when InstanceName::atom(),
                                  KeyBin::binary()).
 get(InstanceName, KeyBin) ->
+    statsd:leo_increment("leo_backend_db_api.get"),
     do_request(get, [InstanceName, KeyBin]).
 
 
@@ -108,6 +110,7 @@ get(InstanceName, KeyBin) ->
              {error, any()} when InstanceName::atom(),
                                  KeyBin::binary()).
 delete(InstanceName, KeyBin) ->
+    statsd:leo_increment("leo_backend_db_api.delete"),
     do_request(delete, [InstanceName, KeyBin]).
 
 
@@ -130,6 +133,7 @@ fetch(InstanceName, KeyBin, Fun) ->
                                  Fun::function(),
                                  MaxKeys::pos_integer()).
 fetch(InstanceName, KeyBin, Fun, MaxKeys) ->
+    statsd:leo_increment("leo_backend_db_api.fetch"),
     case ets:lookup(?ETS_TABLE_NAME, InstanceName) of
         [] ->
             not_found;
@@ -151,6 +155,7 @@ fetch(Res) -> {ok, Res}.
 -spec(first(InstanceName) ->
              {ok, list()} | {error, any()} when InstanceName::atom()).
 first(InstanceName) ->
+    statsd:leo_increment("leo_backend_db_api.first"),
     case ets:lookup(?ETS_TABLE_NAME, InstanceName) of
         [] ->
             not_found;
@@ -177,6 +182,7 @@ first_1(List) ->
 -spec(status(InstanceName) ->
              [{atom(), term()}] when InstanceName::atom()).
 status(InstanceName) ->
+    statsd:leo_increment("leo_backend_db_api.status"),
     case ets:lookup(?ETS_TABLE_NAME, InstanceName) of
         [] ->
             not_found;
@@ -211,6 +217,7 @@ finish_compaction(InstanceName, Commit) ->
                                       KeyBin::binary(),
                                       ValueBin::binary()).
 put_value_to_new_db(InstanceName, KeyBin, ValueBin) ->
+    statsd:leo_increment("leo_backend_db_api.put_value_to_new_db"),
     Id = get_object_storage_pid(InstanceName),
     ?SERVER_MODULE:put_value_to_new_db(Id, KeyBin, ValueBin).
 
