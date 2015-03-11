@@ -72,8 +72,10 @@ status(Table) ->
              {error, any()} when Table::atom(),
                                  Key::binary()).
 get(Table, Key) ->
+    statsd:leo_increment("leo_backend_db_ets.get"),
     case catch ets:lookup(Table, Key) of
         [] ->
+            statsd:leo_increment("leo_backend_db_ets.get.not_found"),
             not_found;
         [{_Key, Value}] ->
             {ok, Value};
@@ -92,6 +94,7 @@ get(Table, Key) ->
                                       Key::binary(),
                                       Value::binary()).
 put(Table, Key, Value) ->
+    statsd:leo_increment("leo_backend_db_ets.put"),
     case catch ets:insert(Table, {Key, Value}) of
         true ->
             ok;
@@ -114,6 +117,7 @@ put(Table, Key, Value) ->
              ok | not_found | {error, any()} when Table::atom(),
                                                   Key::binary()).
 delete(Table, Key) ->
+    statsd:leo_increment("leo_backend_db_ets.delete"),
     case get(Table, Key) of
         {ok, Value} ->
             case catch ets:delete_object(Table, {Key, Value}) of
@@ -157,6 +161,7 @@ fold1(_, _)                       -> {error, 'badarg'}.
              not_found |
              {error, any()} when Table::pid()).
 first(Table) ->
+    statsd:leo_increment("leo_backend_db_ets.first"),
     case catch ets:first(Table) of
         '$end_of_table' ->
             not_found;
