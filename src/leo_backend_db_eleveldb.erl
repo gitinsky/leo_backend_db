@@ -132,8 +132,10 @@ status(_Handler) ->
              {error, any()} when Handler::eleveldb:db_ref(),
                                  Key::binary()).
 get(Handler, Key) ->
+    statsd:leo_increment("leo_backend_db_eleveldb.get"),
     case catch eleveldb:get(Handler, Key, []) of
         not_found ->
+            statsd:leo_increment("leo_backend_db_eleveldb.get.not_found"),
             not_found;
         {ok, Value} ->
             {ok, Value};
@@ -159,6 +161,7 @@ get(Handler, Key) ->
                                       Key::binary(),
                                       Value::binary()).
 put(Handler, Key, Value) ->
+    statsd:leo_increment("leo_backend_db_eleveldb.put"),
     case catch eleveldb:put(Handler, Key, Value, []) of
         ok ->
             catch ets:update_counter(
@@ -185,6 +188,7 @@ put(Handler, Key, Value) ->
              ok | {error, any()} when Handler::eleveldb:db_ref(),
                                       Key::binary()).
 delete(Handler, Key) ->
+    statsd:leo_increment("leo_backend_db_eleveldb.delete"),
     case ?MODULE:get(Handler, Key) of
         {ok,_} ->
             case catch eleveldb:delete(Handler, Key, []) of
@@ -245,6 +249,7 @@ prefix_search(Handler, Key, Fun, MaxKeys) ->
 -spec(first(Handler) ->
              {ok, any()} | not_found | {error, any()} when Handler::eleveldb:db_ref()).
 first(Handler) ->
+    statsd:leo_increment("leo_backend_db_eleveldb.first"),
     case catch eleveldb:iterator(Handler, []) of
         {ok, Itr} ->
             case eleveldb:iterator_move(Itr, first)  of
