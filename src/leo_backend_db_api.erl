@@ -136,6 +136,7 @@ fetch(InstanceName, KeyBin, Fun, MaxKeys) ->
     statsd:leo_increment("leo_backend_db_api.fetch"),
     case ets:lookup(?ETS_TABLE_NAME, InstanceName) of
         [] ->
+            statsd:leo_increment("leo_backend_db_api.fetch.not_found"),
             not_found;
         [{InstanceName, List}] ->
             Res = lists:foldl(fun(Id, Acc) ->
@@ -158,6 +159,7 @@ first(InstanceName) ->
     statsd:leo_increment("leo_backend_db_api.first"),
     case ets:lookup(?ETS_TABLE_NAME, InstanceName) of
         [] ->
+            statsd:leo_increment("leo_backend_db_api.first.not_found"),
             not_found;
         [{InstanceName, List}] ->
             Res = lists:foldl(fun(Id, Acc) ->

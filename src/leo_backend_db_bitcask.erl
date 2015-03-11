@@ -87,10 +87,12 @@ status(Handler) ->
              {error, any()} when Handler::reference(),
                                  Key::binary()).
 get(Handler, Key) ->
+    statsd:leo_increment("leo_backend_db_bitcask.get"),
     case catch bitcask:get(Handler, Key) of
         {ok, Value} ->
             {ok, Value};
         not_found ->
+            statsd:leo_increment("leo_backend_db_bitcask.get.not_found"),
             not_found;
         {error, Cause} ->
             error_logger:error_msg("~p,~p,~p,~p~n",
@@ -112,6 +114,7 @@ get(Handler, Key) ->
                                       Key::binary(),
                                       Value::binary()).
 put(Handler, Key, Value) ->
+    statsd:leo_increment("leo_backend_db_bitcask.put"),
     case catch bitcask:put(Handler, Key, Value) of
         ok ->
             ok;
@@ -134,6 +137,7 @@ put(Handler, Key, Value) ->
              ok | {error, any()} when Handler::reference(),
                                       Key::binary()).
 delete(Handler, Key) ->
+    statsd:leo_increment("leo_backend_db_bitcask.delete"),
     case catch bitcask:delete(Handler, Key) of
         ok ->
             ok;
@@ -170,6 +174,7 @@ prefix_search(Handler, _Key, Fun, MaxKeys) ->
              not_found |
              {error, any()} when Handler::reference()).
 first(Handler) ->
+    statsd:leo_increment("leo_backend_db_bitcask.first"),
     fold(first, Handler, fun(K, V, Acc0) ->
                                  case Acc0 of
                                      [] -> [{K, V} | Acc0];
