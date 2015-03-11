@@ -194,6 +194,7 @@ fold(Mode, Handler, Fun, MaxKeys) ->
 
 %% @private
 fold_1(_, [],_) ->
+    statsd:leo_increment("leo_backend_db_bitcask.fold_1.not_found"),
     not_found;
 fold_1(first, [{K, V}|_],_) ->
     {ok, K, V};
